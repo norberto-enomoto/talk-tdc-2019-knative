@@ -1,24 +1,23 @@
-# Use the offical Golang image to create a build artifact.
-# This is based on Debian and sets the GOPATH to /go.
-# https://hub.docker.com/_/golang
-FROM golang:1.12 as builder
+# Use the official maven/Java 8 image to create a build artifact.
+# https://hub.docker.com/_/maven
+FROM maven:3.5-jdk-8-alpine as builder
 
 # Copy local code to the container image.
-WORKDIR /go/src/github.com/knative/docs/helloworld
-COPY . .
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
 
-# Build the command inside the container.
-# (You may fetch or manage dependencies here,
-# either manually or with a tool like "godep".)
-RUN CGO_ENABLED=0 GOOS=linux go build -v -o helloworld
+# Build a release artifact.
+RUN mvn package -DskipTests
 
-# Use a Docker multi-stage build to create a lean production image.
+# Use AdoptOpenJDK for base image.
+# It's important to use OpenJDK 8u191 or above that has container support enabled.
+# https://hub.docker.com/r/adoptopenjdk/openjdk8
 # https://docs.docker.com/develop/develop-images/multistage-build/#use-multi-stage-builds
-FROM alpine
-RUN apk add --no-cache ca-certificates
+FROM adoptopenjdk/openjdk8:jdk8u202-b08-alpine-slim
 
-# Copy the binary to the production image from the builder stage.
-COPY --from=builder /go/src/github.com/knative/docs/helloworld/helloworld /helloworld
+# Copy the jar to the production image from the builder stage.
+COPY --from=builder /app/target/helloworld-*.jar /helloworld.jar
 
 # Run the web service on container startup.
-CMD ["/helloworld"]
+CMD ["java","-Djava.security.egd=file:/dev/./urandom","-Dserver.port=${PORT}","-jar","/helloworld.jar"]

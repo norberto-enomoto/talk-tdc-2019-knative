@@ -1,14 +1,14 @@
-A simple web app written in Go that you can use for testing. It reads in an env
-variable `TARGET` and prints `Hello ${TARGET}!`. If `TARGET` is not specified,
-it will use `World` as the `TARGET`.
+A simple web app written in Java using Spring Boot 2.0 that you can use for
+testing. It reads in an env variable `TARGET` and prints "Hello \${TARGET}!". If
+TARGET is not specified, it will use "World" as the TARGET.
 
 Follow the steps below to create the sample code and then deploy the app to your
 cluster. You can also download a working copy of the sample, by running the
 following commands:
 
 ```shell
-git clone -b "release-0.6" https://github.com/knative/docs knative-docs
-cd knative-docs/docs/serving/samples/hello-world/helloworld-go
+git clone -b "release-0.6" https://github.com/knative/docs knative-docs cd
+knative-docs/serving/samples/hello-world/helloworld-java-spring
 ```
 
 ## Before you begin
@@ -18,74 +18,101 @@ cd knative-docs/docs/serving/samples/hello-world/helloworld-go
   create one.
 - [Docker](https://www.docker.com) installed and running on your local machine,
   and a Docker Hub account configured (we'll use it for a container registry).
+- You have installed
+  [Java SE 8 or later JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
 
 ## Recreating the sample code
 
-1. Create a new file named `helloworld.go` and paste the following code. This
-   code creates a basic web server which listens on port 8080:
+1. From the console, create a new empty web project using the curl and unzip
+   commands:
 
-   ```go
-   package main
+   ```shell
+   curl https://start.spring.io/starter.zip \
+       -d dependencies=web \
+       -d name=helloworld \
+       -d artifactId=helloworld \
+       -o helloworld.zip
+   unzip helloworld.zip
+   ```
 
-   import (
-     "fmt"
-     "log"
-     "net/http"
-     "os"
-   )
+   If you don't have curl installed, you can accomplish the same by visiting the
+   [Spring Initializr](https://start.spring.io/) page. Specify Artifact as
+   `helloworld` and add the `Web` dependency. Then click `Generate Project`,
+   download and unzip the sample archive.
 
-   func handler(w http.ResponseWriter, r *http.Request) {
-     log.Print("Hello world received a request.")
-     target := os.Getenv("TARGET")
-     if target == "" {
-       target = "World"
-     }
-     fmt.Fprintf(w, "Hello %s!\n", target)
-   }
+1. Update the `SpringBootApplication` class in
+   `src/main/java/com/example/helloworld/HelloworldApplication.java` by adding a
+   `@RestController` to handle the "/" mapping and also add a `@Value` field to
+   provide the TARGET environment variable:
 
-   func main() {
-     log.Print("Hello world sample started.")
+   ```java
+   package com.example.helloworld;
 
-     http.HandleFunc("/", handler)
+   import org.springframework.beans.factory.annotation.Value;
+   import org.springframework.boot.SpringApplication;
+   import org.springframework.boot.autoconfigure.SpringBootApplication;
+   import org.springframework.web.bind.annotation.GetMapping;
+   import org.springframework.web.bind.annotation.RestController;
 
-     port := os.Getenv("PORT")
-     if port == "" {
-       port = "8080"
-     }
+   @SpringBootApplication
+   public class HelloworldApplication {
 
-     log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
+      @Value("${TARGET:World}")
+      String target;
+
+      @RestController
+      class HelloworldController {
+          @GetMapping("/")
+          String hello() {
+              return "Hello " + target + "!";
+          }
+      }
+
+      public static void main(String[] args) {
+          SpringApplication.run(HelloworldApplication.class, args);
+      }
    }
    ```
 
+1. Run the application locally:
+
+   ```shell
+   ./mvnw package && java -jar target/helloworld-0.0.1-SNAPSHOT.jar
+   ```
+
+   Go to `http://localhost:8080/` to see your `Hello World!` message.
+
 1. In your project directory, create a file named `Dockerfile` and copy the code
-   block below into it. For detailed instructions on dockerizing a Go app, see
-   [Deploying Go servers with Docker](https://blog.golang.org/docker).
+   block below into it. For detailed instructions on dockerizing a Spring Boot
+   app, see
+   [Spring Boot with Docker](https://spring.io/guides/gs/spring-boot-docker/).
+   For additional information on multi-stage docker builds for Java see
+   [Creating Smaller Java Image using Docker Multi-stage Build](http://blog.arungupta.me/smaller-java-image-docker-multi-stage-build/).
 
    ```docker
-   # Use the offical Golang image to create a build artifact.
-   # This is based on Debian and sets the GOPATH to /go.
-   # https://hub.docker.com/_/golang
-   FROM golang:1.12 as builder
+   # Use the official maven/Java 8 image to create a build artifact.
+   # https://hub.docker.com/_/maven
+   FROM maven:3.5-jdk-8-alpine as builder
 
    # Copy local code to the container image.
-   WORKDIR /go/src/github.com/knative/docs/helloworld
-   COPY . .
+   WORKDIR /app
+   COPY pom.xml .
+   COPY src ./src
 
-   # Build the command inside the container.
-   # (You may fetch or manage dependencies here,
-   # either manually or with a tool like "godep".)
-   RUN CGO_ENABLED=0 GOOS=linux go build -v -o helloworld
+   # Build a release artifact.
+   RUN mvn package -DskipTests
 
-   # Use a Docker multi-stage build to create a lean production image.
+   # Use AdoptOpenJDK for base image.
+   # It's important to use OpenJDK 8u191 or above that has container support enabled.
+   # https://hub.docker.com/r/adoptopenjdk/openjdk8
    # https://docs.docker.com/develop/develop-images/multistage-build/#use-multi-stage-builds
-   FROM alpine
-   RUN apk add --no-cache ca-certificates
+   FROM adoptopenjdk/openjdk8:jdk8u202-b08-alpine-slim
 
-   # Copy the binary to the production image from the builder stage.
-   COPY --from=builder /go/src/github.com/knative/docs/helloworld/helloworld /helloworld
+   # Copy the jar to the production image from the builder stage.
+   COPY --from=builder /app/target/helloworld-*.jar /helloworld.jar
 
    # Run the web service on container startup.
-   CMD ["/helloworld"]
+   CMD ["java","-Djava.security.egd=file:/dev/./urandom","-Dserver.port=${PORT}","-jar","/helloworld.jar"]
    ```
 
 1. Create a new file, `service.yaml` and copy the following service definition
@@ -96,16 +123,16 @@ cd knative-docs/docs/serving/samples/hello-world/helloworld-go
    apiVersion: serving.knative.dev/v1alpha1
    kind: Service
    metadata:
-     name: helloworld-go
+     name: helloworld-java-spring
      namespace: default
    spec:
      template:
        spec:
          containers:
-           - image: docker.io/{username}/helloworld-go
+           - image: docker.io/{username}/helloworld-java-spring
              env:
                - name: TARGET
-                 value: "Go Sample v1"
+                 value: "Spring Boot Sample v1"
    ```
 
 ## Building and deploying the sample
@@ -119,10 +146,10 @@ folder) you're ready to build and deploy the sample app.
 
    ```shell
    # Build the container on your local machine
-   docker build -t {username}/helloworld-go .
+   docker build -t {username}/helloworld-java-spring .
 
    # Push the container to docker registry
-   docker push {username}/helloworld-go
+   docker push {username}/helloworld-java-spring
    ```
 
 1. After the build has completed and the container is pushed to docker hub, you
@@ -137,14 +164,12 @@ folder) you're ready to build and deploy the sample app.
 1. Now that your service is created, Knative will perform the following steps:
 
    - Create a new immutable revision for this version of the app.
-   - Network programming to create a route, ingress, service, and load balance
+   - Network programming to create a route, ingress, service, and load balancer
      for your app.
    - Automatically scale your pods up and down (including to zero active pods).
 
-1. Run the following command to find the external IP address for your service.
-   The ingress IP for your cluster is returned. If you just created your
-   cluster, you might need to wait and rerun the command until your service gets
-   asssigned an external IP address.
+1. To find the IP address for your service, use. If your cluster is new, it may
+   take sometime for the service to get asssigned an external IP address.
 
    ```shell
    # In Knative 0.2.x and prior versions, the `knative-ingressgateway` service was used instead of `istio-ingressgateway`.
@@ -158,44 +183,42 @@ folder) you're ready to build and deploy the sample app.
    fi
 
    kubectl get svc $INGRESSGATEWAY --namespace istio-system
-   ```
 
-   Example:
-
-   ```shell
    NAME                     TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)                                      AGE
    xxxxxxx-ingressgateway   LoadBalancer   10.23.247.74   35.203.155.229   80:32380/TCP,443:32390/TCP,32400:32400/TCP   2d
+
+   # Now you can assign the external IP address to the env variable.
+   export IP_ADDRESS=<EXTERNAL-IP column from the command above>
+
+   # Or just execute:
+
+   export IP_ADDRESS=$(kubectl get svc $INGRESSGATEWAY \
+     --namespace istio-system \
+     --output jsonpath="{.status.loadBalancer.ingress[*].ip}")
    ```
 
-1. Run the following command to find the domain URL for your service:
+1. To find the URL for your service, use
 
    ```shell
-   kubectl get ksvc helloworld-go  --output=custom-columns=NAME:.metadata.name,DOMAIN:.status.domain
+   kubectl get ksvc helloworld-java-spring \
+      --output=custom-columns=NAME:.metadata.name,DOMAIN:.status.domain
+
+   NAME                       DOMAIN
+   helloworld-java-spring     helloworld-java-spring.default.example.com
+
+   # Or simply:
+   export DOMAIN_NAME=$(kubectl get ksvc helloworld-java-spring \
+     --output jsonpath={.status.domain}
    ```
 
-   Example:
+1. Now you can make a request to your app to see the result. Presuming, the IP
+   address you got in the step above is in the `${IP_ADDRESS}` env variable:
 
    ```shell
-    NAME                DOMAIN
-    helloworld-go       helloworld-go.default.example.com
+   curl -H "Host: ${DOMAIN_NAME}" http://${IP_ADDRESS}
+
+   Hello Spring Boot Sample v1!
    ```
-
-1. Test your app by sending it a request. Use the following `curl` command with
-   the domain URL `helloworld-go.default.example.com` and `EXTERNAL-IP` address
-   that you retrieved in the previous steps:
-
-   ```shell
-   curl -H "Host: helloworld-go.default.example.com" http://{EXTERNAL_IP_ADDRESS}
-   ```
-
-   Example:
-
-   ```shell
-   curl -H "Host: helloworld-go.default.example.com" http://35.203.155.229
-   Hello Go Sample v1!
-   ```
-
-   > Note: Add `-v` option to get more detail if the `curl` command failed.
 
 ## Removing the sample app deployment
 
