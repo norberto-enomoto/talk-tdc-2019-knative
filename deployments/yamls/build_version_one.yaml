@@ -1,16 +1,16 @@
 apiVersion: build.knative.dev/v1alpha1
 kind: Build
 metadata:
-  name: docker-build
+  name: build-v1
 spec:
   serviceAccountName: knative-build
   source:
     git:
-      url: https://github.com/dgageot/hello.git
+      url: https://github.com/larchanjo/poc-micronaut-knative
       revision: master
   steps:
   - name: build-and-push
     image: gcr.io/kaniko-project/executor:v0.1.0
     args:
     - --dockerfile=/workspace/Dockerfile
-    - --destination=gcr.io/knati-241817/hello-nginx
+    - --destination=gcr.io/knati-241817/tdc:v1

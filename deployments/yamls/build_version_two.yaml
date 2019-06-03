@@ -1,7 +1,7 @@
 apiVersion: build.knative.dev/v1alpha1
 kind: Build
 metadata:
-  name: docker-build
+  name: build-v2
 spec:
   serviceAccountName: knative-build
   source:
@@ -13,4 +13,4 @@ spec:
     image: gcr.io/kaniko-project/executor:v0.1.0
     args:
     - --dockerfile=/workspace/Dockerfile
-    - --destination=gcr.io/knati-241817/hello-nginx
+    - --destination=gcr.io/knati-241817/tdc:v2
