@@ -6,8 +6,9 @@ spec:
   serviceAccountName: knative-build
   source:
     git:
-      url: https://github.com/larchanjo/poc-micronaut-knative
+      url: https://github.com/larchanjo/talk-tdc-2019-knative
       revision: master
+    subPath: "code"
   steps:
   - name: build-and-push
     image: gcr.io/kaniko-project/executor:v0.1.0
