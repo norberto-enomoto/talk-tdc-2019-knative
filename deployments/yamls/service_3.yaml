@@ -1,0 +1,21 @@
+apiVersion: serving.knative.dev/v1alpha1
+kind: Service
+metadata:
+  name: service
+  namespace: default
+spec:
+  template:
+    spec:
+      containers:
+      - image: gcr.io/knati-241817/tdc:v1
+        env:
+          - name: TARGET
+            value: TDC-BH-2019 - Version 2.0
+  traffic:
+  traffic:
+  - tag: current
+    revisionName: service-v1-w4gkw
+    percent: 50
+  - tag: latest
+    latestRevision: true
+    percent: 50

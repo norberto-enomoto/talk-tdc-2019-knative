@@ -18,7 +18,5 @@ FROM openjdk:8-jre-alpine
 # Copy the jar to the production image from the builder stage.
 COPY --from=builder /app/target/helloworld-0.0.1-SNAPSHOT-jar-with-dependencies.jar /helloworld.jar
 
-
 # Run the web service on container startup.
 CMD ["java","-Dserver.port=${PORT}","-jar","/helloworld.jar"]
-

@@ -1,7 +1,7 @@
 apiVersion: serving.knative.dev/v1alpha1
 kind: Service
 metadata:
-  name: service-v1
+  name: service
   namespace: default
 spec:
   runLatest:
@@ -10,3 +10,6 @@ spec:
         spec:
           container:
             image: gcr.io/knati-241817/tdc:v1
+            env:
+              - name: TARGET
+                value: TDC-BH-2019 - Version 1.0
