@@ -9,7 +9,7 @@ public class HelloWorldApplication {
     port(Integer.valueOf(System.getenv("PORT")));
     final String defaultMessage = "Default message use the environment TARGET to set a new one";
     final String targetEnvironment = System.getenv("TARGET");
-    final String message = (targetEnvironment != null) ? targetEnvironment : defaultMessage;
+    final String message = targetEnvironment != null ? targetEnvironment : defaultMessage;
     get("/", (req, res) -> message);
   }
 
