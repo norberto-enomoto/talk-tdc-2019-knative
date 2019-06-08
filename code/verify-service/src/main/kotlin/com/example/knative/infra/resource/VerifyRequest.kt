@@ -1,4 +1,4 @@
-package com.example.knative.infra
+package com.example.knative.infra.resource
 
 import com.example.knative.domain.Verify
 import javax.validation.constraints.NotBlank

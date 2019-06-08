@@ -1,10 +1,11 @@
-package com.example.knative.infra
+package com.example.knative.infra.resource
 
 import com.example.knative.domain.VerifyService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import java.util.*
 
-@RestController
+@RestController()
 @RequestMapping("/verify")
 class VerifyResource(val verifyService: VerifyService) {
 
