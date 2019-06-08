@@ -1,9 +1,9 @@
-package com.example.helloworld;
+package com.example.knative;
 
 import static spark.Spark.get;
 import static spark.Spark.port;
 
-public class HelloWorldApplication {
+public class Application {
 
   public static void main(String args[]) {
     port(Integer.valueOf(System.getenv("PORT")));

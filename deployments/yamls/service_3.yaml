@@ -14,7 +14,7 @@ spec:
   traffic:
   traffic:
   - tag: current
-    revisionName: service-v1-w4gkw
+    revisionName: service-97fjn
     percent: 50
   - tag: latest
     latestRevision: true

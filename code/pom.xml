@@ -5,25 +5,50 @@
 
 
 	<groupId>com.example</groupId>
-	<artifactId>helloworld</artifactId>
+	<artifactId>knative</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>helloworld</name>
 	<packaging>jar</packaging>
-	<description>Demo project for simple helloworld in java</description>
 
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>com.sparkjava</groupId>
+			<artifactId>spark-core</artifactId>
+			<version>2.7.2</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>1.7.21</version>
+		</dependency>
+
+		<!-- Twilio -->
+		<dependency>
+			<groupId>com.twilio.sdk</groupId>
+			<artifactId>twilio</artifactId>
+			<version>7.17.0</version>
+		</dependency>
+
+	</dependencies>
+
 	<build>
+
 		<plugins>
+
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>3.1.1</version>
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>com.example.helloworld.HelloWorldApplication</mainClass>
+							<mainClass>com.example.knative.Application</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
@@ -40,20 +65,9 @@
 					</execution>
 				</executions>
 			</plugin>
-		</plugins>
-	</build>
-	<dependencies>
-		<dependency>
-			<groupId>com.sparkjava</groupId>
-			<artifactId>spark-core</artifactId>
-			<version>2.7.2</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>1.7.21</version>
-		</dependency>
 
-	</dependencies>
+		</plugins>
+
+	</build>
+
 </project>
