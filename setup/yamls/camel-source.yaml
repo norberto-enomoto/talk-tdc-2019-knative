@@ -3,21 +3,21 @@
 apiVersion: sources.eventing.knative.dev/v1alpha1
 kind: CamelSource
 metadata:
-  name: camel-telegram-source
+  name: telegram-source
 spec:
   source:
     component:
       uri: telegram:bots
       properties:
         # Camel Telegram component option (ask it to the Botfather: https://telegram.me/botfather)
-        camel.component.telegram.authorizationToken: "<put-your-token-here>"
+        camel.component.telegram.authorizationToken: "798541924:AAEOzXWar0UNx2qWj-r8EHUFXJiU0tYAI-E"
 
         # Camel K option to enable serialization of the component output
         camel.component.knative.jsonSerializationEnabled: "true"
   sink:
     apiVersion: eventing.knative.dev/v1alpha1
     kind: Channel
-    name: camel-test
+    name: telegram-channel
 
 ---
 
@@ -26,7 +26,7 @@ spec:
 apiVersion: eventing.knative.dev/v1alpha1
 kind: Channel
 metadata:
-  name: verify-channel
+  name: telegram-channel
 spec:
   provisioner:
     apiVersion: eventing.knative.dev/v1alpha1
@@ -40,17 +40,17 @@ spec:
 apiVersion: eventing.knative.dev/v1alpha1
 kind: Subscription
 metadata:
-  name: verify-subscription
+  name: telegram-subscription
 spec:
   channel:
     apiVersion: eventing.knative.dev/v1alpha1
     kind: Channel
-    name: verify-channel
+    name: telegram-channel
   subscriber:
     ref:
       apiVersion: serving.knative.dev/v1alpha1
       kind: Service
-      name: verify-service
+      name: telegram-service
 
 --- 
 
@@ -59,11 +59,11 @@ spec:
 apiVersion: serving.knative.dev/v1alpha1
 kind: Service
 metadata:
-  name: verify-service
+  name: telegram-service
 spec:
   runLatest:
     configuration:
       revisionTemplate:
         spec:
           container:
-            image: github.com/knative/eventing-sources/cmd/event_display
+            image: gcr.io/knative-releases/github.com/knative/eventing-sources/cmd/event_display@sha256:bf45b3eb1e7fc4cb63d6a5a6416cf696295484a7662e0cf9ccdf5c080542c21d
