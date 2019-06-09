@@ -12,3 +12,4 @@ rm kaniko-secret.json
 
 echo "Installing Camel-K"
 kamel install --registry gcr.io --organization $PROJECT_ID --push-secret kaniko-secret
+kubectl apply -f yamls/camel.yaml
