@@ -14,7 +14,7 @@ spec:
   traffic:
   traffic:
   - tag: current
-    revisionName: service-jhcgz
+    revisionName: service-5xr78
     percent: 50
   - tag: latest
     latestRevision: true

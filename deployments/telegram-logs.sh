@@ -1,2 +1,2 @@
 #!/bin/bash
-kubectl logs -f --selector serving.knative.dev/service=telegram-service -c user-container
+while(true); do kubectl logs -f --selector serving.knative.dev/service=telegram-service -c user-container; done
