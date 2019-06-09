@@ -1,17 +1,17 @@
 apiVersion: build.knative.dev/v1alpha1
 kind: Build
 metadata:
-  name: build-v1
+  name: build
 spec:
   serviceAccountName: knative-build
   source:
     git:
       url: https://github.com/larchanjo/talk-tdc-2019-knative
       revision: master
-    subPath: "code/"
+    subPath: "code/verify-function/"
   steps:
   - name: build-and-push
     image: gcr.io/kaniko-project/executor:v0.1.0
     args:
     - --dockerfile=/workspace/Dockerfile
-    - --destination=gcr.io/knati-241817/tdc:v1
+    - --destination=gcr.io/MY_GCP_PROJECT/tdc:v1

@@ -16,7 +16,7 @@ RUN mvn package -DskipTests
 FROM openjdk:8-jre-alpine
 
 # Copy the jar to the production image from the builder stage.
-COPY --from=builder /app/target/*-0.0.1-SNAPSHOT-jar-with-dependencies.jar /*.jar
+COPY --from=builder /app/target/verify-function-0.0.1-SNAPSHOT-jar-with-dependencies.jar /verify-function.jar
 
 # Run the web service on container startup.
-CMD ["java","-Dserver.port=${PORT}","-jar","/*.jar"]
+CMD ["java","-Dserver.port=${PORT}","-jar","/verify-function.jar"]

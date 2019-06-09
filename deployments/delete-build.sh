@@ -1,2 +1,2 @@
 #!/bin/bash
-kubectl delete -f yamls/build_version_one.yaml
+kubectl delete -f yamls/build.yaml
