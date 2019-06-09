@@ -1,2 +1,2 @@
 #!/bin/bash
-kubectl apply -f yamls/service_1.yaml
+sed "s/MY_GCP_PROJECT/$PROJECT_ID/g" yamls/service_1.yaml | kubectl apply --filename -
