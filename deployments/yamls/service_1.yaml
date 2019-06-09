@@ -13,9 +13,3 @@ spec:
             env:
               - name: TARGET
                 value: 'TDC-BH-2019 - Version 1.0'
-              - name: TWILIO_ACCOUNT
-                value: 'AC6f10422035d75899bfffcc609fe94e1a'
-              - name: TWILIO_TOKEN
-                value: 'dd2cb4f4edd23cbca126ab6169269841'
-              - name: TWILIO_ACCOUNT_NUMBER
-                value: '+551149330140'
