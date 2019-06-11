@@ -12,9 +12,8 @@ spec:
           - name: TARGET
             value: 'TDC-BH-2019 - Version 2.0'
   traffic:
-  traffic:
   - tag: current
-    revisionName: service-5xr78
+    revisionName: service-bw4qs
     percent: 50
   - tag: latest
     latestRevision: true
