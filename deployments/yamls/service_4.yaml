@@ -1,0 +1,24 @@
+apiVersion: serving.knative.dev/v1alpha1
+kind: Service
+metadata:
+  name: service
+  namespace: default
+spec:
+  template:
+    metadata:
+      annotations:
+        # Knative concurrency-based autoscaling (default).
+        autoscaling.knative.dev/class: kpa.autoscaling.knative.dev
+        autoscaling.knative.dev/metric: concurrency
+        # Target 1 requests in-flight per pod.
+        autoscaling.knative.dev/target: "1"
+        # Disable scale to zero with a minScale of 1.
+        autoscaling.knative.dev/minScale: "1"
+        # Limit scaling to 10 pods.
+        autoscaling.knative.dev/maxScale: "10"
+    spec:
+      containers:
+        - image: gcr.io/MY_GCP_PROJECT/tdc:v1
+          env:
+            - name: TARGET
+              value: 'TDC-BH-2019 - Version 3.0'

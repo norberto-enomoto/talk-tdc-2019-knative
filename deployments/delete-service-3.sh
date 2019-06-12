@@ -1,2 +1,2 @@
 #!/bin/bash
-kubectl delete -f yamls/service_2.yaml
+kubectl delete -f yamls/service_3.yaml
