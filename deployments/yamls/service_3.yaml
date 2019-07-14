@@ -10,10 +10,10 @@ spec:
       - image: gcr.io/MY_GCP_PROJECT/tdc:v1
         env:
           - name: TARGET
-            value: 'TDC-BH-2019 - Version 2.0'
+            value: 'TDC-SP-2019 - Version 2.0'
   traffic:
   - tag: current
-    revisionName: service-bw4qs
+    revisionName: service-w8hcz
     percent: 50
   - tag: latest
     latestRevision: true
