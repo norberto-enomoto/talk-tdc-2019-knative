@@ -21,4 +21,4 @@ spec:
         - image: gcr.io/MY_GCP_PROJECT/tdc:v1
           env:
             - name: TARGET
-              value: 'TDC-SP-2019 - Version 3.0'
+              value: 'TDC-POA 2019 - Version 4.0'
